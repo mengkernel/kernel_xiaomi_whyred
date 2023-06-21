@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+HEAD=$(git rev-parse HEAD)
+OUT_DIR=.out
+DEVICE=whyred
+scripts/update_defconfig $DEVICE
+echo "Regenerate defconfig ..."
+rm -rf $OUT_DIR && mkdir $OUT_DIR
+make ${DEVICE}_defconfig LLVM=1 LLVM_IAS=1 O=$OUT_DIR || exit 0
+mv $OUT_DIR/.config arch/arm64/configs/cat_defconfig || exit 0
+echo "Commiting ..."
+git add arch/arm64/configs/
+git commit -sm "ARM64: configs: regenerate mengkernel/kernel_xiaomi_whyred@${HEAD}"
